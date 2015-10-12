@@ -1,0 +1,143 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title> Node.js v4.1.2 Manual &amp; Documentation</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic">
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/sh.css">
+    <link rel="canonical" href="documentation.html">
+</head>
+<body class="alt apidoc" id="api-section-index">
+<div id="content" class="clearfix">
+    <div id="column2" class="interior">
+        <div id="intro" class="interior">
+            <a href="index.html" title="Go back to the home page">
+                Node.js (1)
+            </a>
+        </div>
+        <ul>
+            <li><a class="nav-documentation" href="documentation.html">About these Docs</a></li>
+            <li><a class="nav-synopsis" href="synopsis.html">Synopsis</a></li>
+            <li><a class="nav-assert" href="assert.html">Assertion Testing</a></li>
+            <li><a class="nav-buffer" href="buffer.html">Buffer</a></li>
+            <li><a class="nav-addons" href="addons.html">C/C++ Addons</a></li>
+            <li><a class="nav-child_process" href="child_process.html">Child Processes</a></li>
+            <li><a class="nav-cluster" href="cluster.html">Cluster</a></li>
+            <li><a class="nav-console" href="console.html">Console</a></li>
+            <li><a class="nav-crypto" href="crypto.html">Crypto</a></li>
+            <li><a class="nav-debugger" href="debugger.html">Debugger</a></li>
+            <li><a class="nav-dns" href="dns.html">DNS</a></li>
+            <li><a class="nav-domain" href="domain.html">Domain</a></li>
+            <li><a class="nav-errors" href="errors.html">Errors</a></li>
+            <li><a class="nav-events" href="events.html">Events</a></li>
+            <li><a class="nav-fs" href="fs.html">File System</a></li>
+            <li><a class="nav-globals" href="globals.html">Globals</a></li>
+            <li><a class="nav-http" href="http.html">HTTP</a></li>
+            <li><a class="nav-https" href="https.html">HTTPS</a></li>
+            <li><a class="nav-modules" href="modules.html">Modules</a></li>
+            <li><a class="nav-net" href="net.html">Net</a></li>
+            <li><a class="nav-os" href="os.html">OS</a></li>
+            <li><a class="nav-path" href="path.html">Path</a></li>
+            <li><a class="nav-process" href="process.html">Process</a></li>
+            <li><a class="nav-punycode" href="punycode.html">Punycode</a></li>
+            <li><a class="nav-querystring" href="querystring.html">Query Strings</a></li>
+            <li><a class="nav-readline" href="readline.html">Readline</a></li>
+            <li><a class="nav-repl" href="repl.html">REPL</a></li>
+            <li><a class="nav-stream" href="stream.html">Stream</a></li>
+            <li><a class="nav-string_decoder" href="string_decoder.html">String Decoder</a></li>
+            <li><a class="nav-timers" href="timers.html">Timers</a></li>
+            <li><a class="nav-tls" href="tls.html">TLS/SSL</a></li>
+            <li><a class="nav-tty" href="tty.html">TTY</a></li>
+            <li><a class="nav-dgram" href="dgram.html">UDP/Datagram</a></li>
+            <li><a class="nav-url" href="url.html">URL</a></li>
+            <li><a class="nav-util" href="util.html">Utilities</a></li>
+            <li><a class="nav-v8" href="v8.html">V8</a></li>
+            <li><a class="nav-vm" href="vm.html">VM</a></li>
+            <li><a class="nav-zlib" href="zlib.html">ZLIB</a></li>
+        </ul>
+
+    </div>
+
+    <div id="column1" data-id="index" class="interior">
+        <header>
+            <h1>Node.js v4.1.2 Documentation</h1>
+            <div id="gtoc">
+                <p>
+                    <a href="index.html" name="toc">Index</a> |
+                    <a href="all.html">View on single page</a> |
+                    <a href="index.json">View as JSON</a>
+                </p>
+            </div>
+            <hr>
+        </header>
+
+        <div id="toc">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#documentation_about_this_documentation">About this Documentation</a><ul>
+                    <li><a href="#documentation_stability_index">Stability Index</a></li>
+                    <li><a href="#documentation_json_output">JSON Output</a></li>
+                </ul>
+                </li>
+            </ul>
+
+        </div>
+
+        <div id="apicontent">
+            <h1>关于此文档<span><a class="mark" href="#documentation_about_this_documentation" id="documentation_about_this_documentation">#</a></span></h1>
+            <!-- type=misc -->
+
+            <p>本文档的目标是从参考和概念的角度全面解释 Node.js 的 API来全面的解释Node.js API。每一
+                章节描述的是一个内置模块或高级概念
+
+            </p>
+            <p>在标题下面的列表详细说明了, 属性类型, 函数参数, 以及事件处理器参数
+
+            </p>
+            <p>每一个<code>.html</code>文档都有其对应的<code>.json</code>文档，用有结构的方式呈现出相同的信息。  但是这个特性是实验性的，
+                因为有利于想通过此文档进行程序设计开发的IDE和实用工具，所以增加到了文档中
+            </p>
+
+            <p>每一个<code>.html</code>和<code>.json</code>文件通过相应的<code>.markdown</code>文件生成，这些<code>.markdown</code>
+                文件位于Node.js源代码树的<code>doc/api/</code>文件夹。
+                文档是通过<code>tools/doc/generate.js</code>程序来生成的，HTML模板的位置位于<code>doc/template.html</code>
+            </p>
+            <h2>Stability Index(稳定度)<span><a class="mark" href="#documentation_stability_index" id="documentation_stability_index">#</a></span></h2>
+            <!--type=misc-->
+
+            <p>在文档中, 你可以了解每个章节的稳定度。 Node.js API在不断的改变中, 随着它的成熟, 某些部分会变得比其他更加可靠。
+                一些模块经过严格的验证, 在开发中有很高的依赖度, 所以它们几乎不会改变.
+                而其他的一些模块是全新的、实验性的或证实有危险性的正在重新设计中
+
+            </p>
+            <p>稳定度定义如下:
+
+            </p>
+<pre class="api_stability_0">Stability: 0 - Deprecated(弃用)
+此功能被认定为有问题的, 注定会改变.  不要依赖它们，否则可能会引起警告.
+不应该考虑向后兼容</pre><pre class="api_stability_1">Stability: 1 - Experimental(实验性)
+此功能可能会改变, 并且被命令行标记封闭
+在未来的版本中可能会被移除或者改变</pre><pre class="api_stability_2">Stability: 2 - Stable(稳定)
+此API被证明是没问题的。 与npm生态系统的兼容性有着很高的优先级，
+并且不会被破坏，除非绝对必要。</pre><pre class="api_stability_3">Stability: 3 - Locked(锁定)
+只会因为安全、性能、漏洞修复问题被修改
+尝试改变这部分的API将会被拒绝</pre><h2>JSON Output<span><a class="mark" href="#documentation_json_output" id="documentation_json_output">#</a></span></h2>
+            <pre class="api_stability_1">Stability: 1 - Experimental</pre><p>在markdown中的每一个HTML都有其对应并且拥有相同数据的JSON文件
+        </p>
+            <p>node v0.6.12版本中增加了此功能。是实验性的(experimental).
+            </p>
+
+        </div>
+    </div>
+</div>
+<div id="footer">
+</div>
+
+<script src="assets/sh_main.js"></script>
+<script src="assets/sh_javascript.min.js"></script>
+<script>highlight(undefined, undefined, 'pre');</script>
+</body>
+</html>
+
