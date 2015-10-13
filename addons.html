@@ -1,0 +1,965 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Addons Node.js v4.2.0 Manual &amp; Documentation</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic">
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/sh.css">
+    <link rel="canonical" href="addons.html">
+</head>
+<body class="alt apidoc" id="api-section-addons">
+<div id="content" class="clearfix">
+    <div id="column2" class="interior">
+        <div id="intro" class="interior">
+            <a href="index.html" title="Go back to the home page">
+                Node.js (1)
+            </a>
+        </div>
+        <ul>
+            <li><a class="nav-documentation" href="documentation.html">About these Docs</a></li>
+            <li><a class="nav-synopsis" href="synopsis.html">Synopsis</a></li>
+            <li><a class="nav-assert" href="assert.html">Assertion Testing</a></li>
+            <li><a class="nav-buffer" href="buffer.html">Buffer</a></li>
+            <li><a class="nav-addons active" href="addons.html">C/C++ Addons</a></li>
+            <li><a class="nav-child_process" href="child_process.html">Child Processes</a></li>
+            <li><a class="nav-cluster" href="cluster.html">Cluster</a></li>
+            <li><a class="nav-console" href="console.html">Console</a></li>
+            <li><a class="nav-crypto" href="crypto.html">Crypto</a></li>
+            <li><a class="nav-debugger" href="debugger.html">Debugger</a></li>
+            <li><a class="nav-dns" href="dns.html">DNS</a></li>
+            <li><a class="nav-domain" href="domain.html">Domain</a></li>
+            <li><a class="nav-errors" href="errors.html">Errors</a></li>
+            <li><a class="nav-events" href="events.html">Events</a></li>
+            <li><a class="nav-fs" href="fs.html">File System</a></li>
+            <li><a class="nav-globals" href="globals.html">Globals</a></li>
+            <li><a class="nav-http" href="http.html">HTTP</a></li>
+            <li><a class="nav-https" href="https.html">HTTPS</a></li>
+            <li><a class="nav-modules" href="modules.html">Modules</a></li>
+            <li><a class="nav-net" href="net.html">Net</a></li>
+            <li><a class="nav-os" href="os.html">OS</a></li>
+            <li><a class="nav-path" href="path.html">Path</a></li>
+            <li><a class="nav-process" href="process.html">Process</a></li>
+            <li><a class="nav-punycode" href="punycode.html">Punycode</a></li>
+            <li><a class="nav-querystring" href="querystring.html">Query Strings</a></li>
+            <li><a class="nav-readline" href="readline.html">Readline</a></li>
+            <li><a class="nav-repl" href="repl.html">REPL</a></li>
+            <li><a class="nav-stream" href="stream.html">Stream</a></li>
+            <li><a class="nav-string_decoder" href="string_decoder.html">String Decoder</a></li>
+            <li><a class="nav-timers" href="timers.html">Timers</a></li>
+            <li><a class="nav-tls" href="tls.html">TLS/SSL</a></li>
+            <li><a class="nav-tty" href="tty.html">TTY</a></li>
+            <li><a class="nav-dgram" href="dgram.html">UDP/Datagram</a></li>
+            <li><a class="nav-url" href="url.html">URL</a></li>
+            <li><a class="nav-util" href="util.html">Utilities</a></li>
+            <li><a class="nav-v8" href="v8.html">V8</a></li>
+            <li><a class="nav-vm" href="vm.html">VM</a></li>
+            <li><a class="nav-zlib" href="zlib.html">ZLIB</a></li>
+        </ul>
+
+    </div>
+
+    <div id="column1" data-id="addons" class="interior">
+        <header>
+            <h1>Node.js v4.2.0 Documentation</h1>
+            <div id="gtoc">
+                <p>
+                    <a href="index.html" name="toc">Index</a> |
+                    <a href="all.html">View on single page</a> |
+                    <a href="addons.json">View as JSON</a>
+                </p>
+            </div>
+            <hr>
+        </header>
+
+        <div id="toc">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#addons_addons">Addons</a><ul>
+                    <li><a href="#addons_hello_world">Hello world</a></li>
+                    <li><a href="#addons_addon_patterns">Addon patterns</a><ul>
+                        <li><a href="#addons_function_arguments">Function arguments</a></li>
+                        <li><a href="#addons_callbacks">Callbacks</a></li>
+                        <li><a href="#addons_object_factory">Object factory</a></li>
+                        <li><a href="#addons_function_factory">Function factory</a></li>
+                        <li><a href="#addons_wrapping_c_objects">Wrapping C++ objects</a></li>
+                        <li><a href="#addons_factory_of_wrapped_objects">Factory of wrapped objects</a></li>
+                        <li><a href="#addons_passing_wrapped_objects_around">Passing wrapped objects around</a></li>
+                        <li><a href="#addons_atexit_hooks">AtExit hooks</a><ul>
+                            <li><a href="#addons_void_atexit_callback_args">void AtExit(callback, args)</a></li>
+                        </ul>
+                        </li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+            </ul>
+
+        </div>
+
+        <div id="apicontent">
+            <h1>Addons<span><a class="mark" href="#addons_addons" id="addons_addons">#</a></span></h1>
+            <p>插件通过动态链接的方式来共享对象。他们提供了Nodejs与C/C++类库之间通信的的桥梁。
+                这些API非常的复杂(就目前来说), 涉及到了多个类库的知识:
+
+            </p>
+            <ul>
+                <li><p>V8 JavaScript引擎, 一个C++库。用于和JavaScript交互的接口:
+                    创建对象, 调用函数, 等等。  文档大部分位于：
+                    <code>v8.h</code>头文件 (<code>deps/v8/include/v8.h</code> Node.js源代码目录里), 也有可用的
+                    <a href="https://v8docs.nodesource.com/">在线文档</a>.</p>
+                </li>
+                <li><p><a href="https://github.com/libuv/libuv">libuv</a>, C语言事件循环库。
+                    任何时候需要等待一个文件描述符变为可读状态，等待一个定时器，
+                    或者等待一个接受信号都需要使用libuv类库的接口。
+                    也就是说，如果你执行任何I/O操作，libuv类库将会被用到。</p>
+                </li>
+                <li><p>内部Node.js类库. 最重要的就是<code>node::ObjectWrap</code>
+                    类，可能是你最想要派生的。</p>
+                </li>
+                <li><p>其他。 参阅<code>deps/</code>获得更多可用类库.</p>
+                </li>
+            </ul>
+            <p>Node 静态编译了所有依赖到它的可执行文件中去了。
+                当编译你的模块时，你不必担心无法连接上述那些类库。
+            </p>
+            <p>下面所有的例子都可以
+                <a href="https://github.com/rvagg/node-addon-examples">下载</a> ，
+                这或许能成为你学习和创作自己addon插件的起点
+
+            </p>
+            <h2>Hello world<span><a class="mark" href="#addons_hello_world" id="addons_hello_world">#</a></span></h2>
+            <p>作为开始，我们编写了一个小的addon插件，这个addon插件的c++代码相当于下面的JavaScript代码。
+
+            </p>
+            <pre><code>module.exports.hello = function() { return &#39;world&#39;; };</code></pre>
+            <p>首先我们创建一个<code>hello.cc</code>文件:
+
+            </p>
+<pre><code>// hello.cc
+    #include &lt;node.h&gt;
+
+    namespace demo {
+
+    using v8::FunctionCallbackInfo;
+    using v8::Isolate;
+    using v8::Local;
+    using v8::Object;
+    using v8::String;
+    using v8::Value;
+
+    void Method(const FunctionCallbackInfo&lt;Value&gt;&amp; args) {
+    Isolate* isolate = args.GetIsolate();
+    args.GetReturnValue().Set(String::NewFromUtf8(isolate, &quot;world&quot;));
+    }
+
+    void init(Local&lt;Object&gt; exports) {
+    NODE_SET_METHOD(exports, &quot;hello&quot;, Method);
+    }
+
+    NODE_MODULE(addon, init)
+
+    }  // namespace demo</code></pre>
+            <p>注意：所有的Node.js插件必须输出一个初始化函数:
+            </p>
+<pre><code>void Initialize(Local&lt;Object&gt; exports);
+    NODE_MODULE(module_name, Initialize)</code></pre>
+            <p>在<code>NODE_MODULE</code>之后没有分好，因为他不是一个函数(见
+                <code>node.h</code>).
+
+            </p>
+            <p>这个<code>module_name</code>需要和最后编译生成的2进制文件名（减去.node后缀名）相同。
+
+            </p>
+            <p>
+                源代码需要生成在<code>addon.node</code>，这个2进制addon插件中。 需要做到这些，我们要创建一个名为<code>binding.gyp</code>的文件，
+                它描述了创建这个模块的配置，并且它的格式是类似JSON的。 文件将被命令<a href="https://github.com/nodejs/node-gyp">node-gyp</a>编译。
+
+            </p>
+<pre><code>{
+    &quot;targets&quot;: [
+    {
+    &quot;target_name&quot;: &quot;addon&quot;,
+    &quot;sources&quot;: [ &quot;hello.cc&quot; ]
+    }
+    ]
+    }</code></pre>
+            <p>下一步是根据当前的操作系统平台，利用<code>node-gyp</code> <code>configure</code>命令，生成合适的项目文件。
+
+            </p>
+            <p>现在你会有一个<code>Makefile</code> (在Unix平台) 或者一个 <code>vcxproj</code> file (在Windows上)，
+                              它们都在<code>build/</code> 文件夹中. 然后执行命令 <code>node-gyp build</code>进行编译。
+
+
+            </p>
+            <p>现在你已经有了编译好的 <code>.node</code> 文件了，这个编译好的绑定文件会在目录 <code>build/Release/</code>下
+
+            </p>
+            <p>
+                现在你可以使用这个2进制addon插件在Node项目<code>hello.js</code> 中了，
+                通过指明require这个刚刚创建的<code>hello.node</code>模块使用它:
+
+            </p>
+<pre><code>// hello.js
+    var addon = require(&#39;./build/Release/addon&#39;);
+
+    console.log(addon.hello()); // &#39;world&#39;</code></pre>
+            <p>请阅读下面的内容获得更多详情或者访问
+                <a href="https://github.com/arturadib/node-qt">https://github.com/arturadib/node-qt</a>获取一个生产环境的例子。
+            </p>
+            <h2>Addon patterns(插件方式)<span><a class="mark" href="#addons_addon_patterns" id="addons_addon_patterns">#</a></span></h2>
+            <p>
+                下面是一些帮助你开始编写addon插件的方式。参考这个在线的<a href="http://izs.me/v8-docs/main.html">v8手册</a>用来帮助你调用各种v8接口，
+                然后是v8的<a href="http://code.google.com/apis/v8/embed.html">嵌入式开发向导</a> ，
+                解释几个概念，如 handles, scopes,function templates等。
+            </p>
+            <p>
+                为了使用这些例子，应先用<code>node-gyp</code>来编译。
+                创建<code>binding.gyp</code>文件
+            </p>
+<pre><code>{
+    &quot;targets&quot;: [
+    {
+    &quot;target_name&quot;: &quot;addon&quot;,
+    &quot;sources&quot;: [ &quot;addon.cc&quot; ]
+    }
+    ]
+    }</code></pre>
+            <p>
+                事实上可以有多个<code>.cc</code>文件，就简单的在<code>sources</code>数组里加上即可，例子：
+            </p>
+            <pre><code>&quot;sources&quot;: [&quot;addon.cc&quot;, &quot;myexample.cc&quot;]</code></pre>
+            <p>现在你有了你的<code>binding.gyp</code>文件,你可以创建和配置插件了：
+
+            </p>
+            <pre><code>$ node-gyp configure build</code></pre>
+            <h3>Function arguments(函数参数)<span><a class="mark" href="#addons_function_arguments" id="addons_function_arguments">#</a></span></h3>
+            <p>下面的部分说明了如何从JavaScript的函数调用获得参数然后返回一个值。这是主要的内容并且仅需要<code>addon.cc</code>。
+
+            </p>
+<pre><code>// addon.cc
+    #include &lt;node.h&gt;
+
+    namespace demo {
+
+    using v8::Exception;
+    using v8::FunctionCallbackInfo;
+    using v8::Isolate;
+    using v8::Local;
+    using v8::Number;
+    using v8::Object;
+    using v8::String;
+    using v8::Value;
+
+    void Add(const FunctionCallbackInfo&lt;Value&gt;&amp; args) {
+    Isolate* isolate = args.GetIsolate();
+
+    if (args.Length() &lt; 2) {
+    isolate-&gt;ThrowException(Exception::TypeError(
+    String::NewFromUtf8(isolate, &quot;Wrong number of arguments&quot;)));
+    return;
+    }
+
+    if (!args[0]-&gt;IsNumber() || !args[1]-&gt;IsNumber()) {
+    isolate-&gt;ThrowException(Exception::TypeError(
+    String::NewFromUtf8(isolate, &quot;Wrong arguments&quot;)));
+    return;
+    }
+
+    double value = args[0]-&gt;NumberValue() + args[1]-&gt;NumberValue();
+    Local&lt;Number&gt; num = Number::New(isolate, value);
+
+    args.GetReturnValue().Set(num);
+    }
+
+    void Init(Local&lt;Object&gt; exports) {
+    NODE_SET_METHOD(exports, &quot;add&quot;, Add);
+    }
+
+    NODE_MODULE(addon, Init)
+
+    }  // namespace demo</code></pre>
+            <p>你可以使用下面的JavaScript代码片段来测试它:
+
+            </p>
+<pre><code>// test.js
+    var addon = require(&#39;./build/Release/addon&#39;);
+
+    console.log( &#39;This should be eight:&#39;, addon.add(3,5) );</code></pre>
+            <h3>Callbacks<span><a class="mark" href="#addons_callbacks" id="addons_callbacks">#</a></span></h3>
+            <p>你可以传递JavaScript functions 到一个C++ function 并且执行他们，这里是 <code>addon.cc</code>文件:
+
+            </p>
+<pre><code>// addon.cc
+    #include &lt;node.h&gt;
+
+    namespace demo {
+
+    using v8::Function;
+    using v8::FunctionCallbackInfo;
+    using v8::Isolate;
+    using v8::Local;
+    using v8::Null;
+    using v8::Object;
+    using v8::String;
+    using v8::Value;
+
+    void RunCallback(const FunctionCallbackInfo&lt;Value&gt;&amp; args) {
+    Isolate* isolate = args.GetIsolate();
+    Local&lt;Function&gt; cb = Local&lt;Function&gt;::Cast(args[0]);
+    const unsigned argc = 1;
+    Local&lt;Value&gt; argv[argc] = { String::NewFromUtf8(isolate, &quot;hello world&quot;) };
+    cb-&gt;Call(Null(isolate), argc, argv);
+    }
+
+    void Init(Local&lt;Object&gt; exports, Local&lt;Object&gt; module) {
+    NODE_SET_METHOD(module, &quot;exports&quot;, RunCallback);
+    }
+
+    NODE_MODULE(addon, Init)
+
+    }  // namespace demo</code></pre>
+            <p>
+                注意这个例子对<code>Init()</code>使用了两个参数，将完整的 <code>module</code> 对象作为第二个参数传入。
+                这允许addon插件完全的重写 <code>exports</code>，这样就可以用一个函数代替多个函数作为<code>exports</code>的属性了。
+
+            </p>
+            <p>使用下面的JavaScript代码片段来测试它:
+
+            </p>
+<pre><code>// test.js
+    var addon = require(&#39;./build/Release/addon&#39;);
+
+    addon(function(msg){
+    console.log(msg); // &#39;hello world&#39;
+    });</code></pre>
+            <h3>Object factory(对象工厂)<span><a class="mark" href="#addons_object_factory" id="addons_object_factory">#</a></span></h3>
+            <p>
+
+                在这个<code>addon.cc</code>文件里用一个c++函数，你可以创建并且返回一个新的对象，
+                这个新的对象拥有一个<code>msg</code>的属性，它的值是通过<code>createObject()</code>方法传入的：
+
+            </p>
+<pre><code>// addon.cc
+    #include &lt;node.h&gt;
+
+    namespace demo {
+
+    using v8::FunctionCallbackInfo;
+    using v8::Isolate;
+    using v8::Local;
+    using v8::Object;
+    using v8::String;
+    using v8::Value;
+
+    void CreateObject(const FunctionCallbackInfo&lt;Value&gt;&amp; args) {
+    Isolate* isolate = args.GetIsolate();
+
+    Local&lt;Object&gt; obj = Object::New(isolate);
+    obj-&gt;Set(String::NewFromUtf8(isolate, &quot;msg&quot;), args[0]-&gt;ToString());
+
+    args.GetReturnValue().Set(obj);
+    }
+
+    void Init(Local&lt;Object&gt; exports, Local&lt;Object&gt; module) {
+    NODE_SET_METHOD(module, &quot;exports&quot;, CreateObject);
+    }
+
+    NODE_MODULE(addon, Init)
+
+    }  // namespace demo</code></pre>
+            <p>在js中测试如下:
+
+            </p>
+<pre><code>// test.js
+    var addon = require(&#39;./build/Release/addon&#39;);
+
+    var obj1 = addon(&#39;hello&#39;);
+    var obj2 = addon(&#39;world&#39;);
+    console.log(obj1.msg+&#39; &#39;+obj2.msg); // &#39;hello world&#39;</code></pre>
+            <h3>Function factory(函数工厂)<span><a class="mark" href="#addons_function_factory" id="addons_function_factory">#</a></span></h3>
+            <p>
+                这次将展示如何创建并返回一个JavaScript function函数，这个函数其实是通过c++包装的。
+            </p>
+<pre><code>// addon.cc
+    #include &lt;node.h&gt;
+
+    namespace demo {
+
+    using v8::Function;
+    using v8::FunctionCallbackInfo;
+    using v8::FunctionTemplate;
+    using v8::Isolate;
+    using v8::Local;
+    using v8::Object;
+    using v8::String;
+    using v8::Value;
+
+    void MyFunction(const FunctionCallbackInfo&lt;Value&gt;&amp; args) {
+    Isolate* isolate = args.GetIsolate();
+    args.GetReturnValue().Set(String::NewFromUtf8(isolate, &quot;hello world&quot;));
+    }
+
+    void CreateFunction(const FunctionCallbackInfo&lt;Value&gt;&amp; args) {
+    Isolate* isolate = args.GetIsolate();
+
+    Local&lt;FunctionTemplate&gt; tpl = FunctionTemplate::New(isolate, MyFunction);
+    Local&lt;Function&gt; fn = tpl-&gt;GetFunction();
+
+    // omit this to make it anonymous
+    fn-&gt;SetName(String::NewFromUtf8(isolate, &quot;theFunction&quot;));
+
+    args.GetReturnValue().Set(fn);
+    }
+
+    void Init(Local&lt;Object&gt; exports, Local&lt;Object&gt; module) {
+    NODE_SET_METHOD(module, &quot;exports&quot;, CreateFunction);
+    }
+
+    NODE_MODULE(addon, Init)
+
+    }  // namespace demo</code></pre>
+            <p>测试:
+
+            </p>
+<pre><code>// test.js
+    var addon = require(&#39;./build/Release/addon&#39;);
+
+    var fn = addon();
+    console.log(fn()); // &#39;hello world&#39;</code></pre>
+            <h3>Wrapping C++ objects（包装c++对象）<span><a class="mark" href="#addons_wrapping_c_objects" id="addons_wrapping_c_objects">#</a></span></h3>
+            <p>
+                这里将创建一个被c++包裹的对象或类<code>MyObject</code>，
+                它是可以在JavaScript中通过 <code>new</code>操作符实例化的。
+                首先我们要准备主要的模块文件<code>addon.cc</code>:
+            </p>
+<pre><code>// addon.cc
+    #include &lt;node.h&gt;
+    #include &quot;myobject.h&quot;
+
+    namespace demo {
+
+    using v8::Local;
+    using v8::Object;
+
+    void InitAll(Local&lt;Object&gt; exports) {
+    MyObject::Init(exports);
+    }
+
+    NODE_MODULE(addon, InitAll)
+
+    }  // namespace demo</code></pre>
+            <p>
+                然后在<code>myobject.h</code>文件中创建你的包装类，它继承自  <code>node::ObjectWrap</code>:
+            </p>
+<pre><code>// myobject.h
+    #ifndef MYOBJECT_H
+    #define MYOBJECT_H
+
+    #include &lt;node.h&gt;
+    #include &lt;node_object_wrap.h&gt;
+
+    namespace demo {
+
+    class MyObject : public node::ObjectWrap {
+    public:
+    static void Init(v8::Local&lt;v8::Object&gt; exports);
+
+    private:
+    explicit MyObject(double value = 0);
+    ~MyObject();
+
+    static void New(const v8::FunctionCallbackInfo&lt;v8::Value&gt;&amp; args);
+    static void PlusOne(const v8::FunctionCallbackInfo&lt;v8::Value&gt;&amp; args);
+    static v8::Persistent&lt;v8::Function&gt; constructor;
+    double value_;
+    };
+
+    }  // namespace demo
+
+    #endif</code></pre>
+            <p>
+                在文件 myobject.cc 可以实施各种你想要暴露给js的方法。
+                这里我们暴露方法名为<code>plusOne</code>给就是，它表示将构造函数的属性加1.
+
+
+            </p>
+<pre><code>// myobject.cc
+    #include &quot;myobject.h&quot;
+
+    namespace demo {
+
+    using v8::Function;
+    using v8::FunctionCallbackInfo;
+    using v8::FunctionTemplate;
+    using v8::Isolate;
+    using v8::Local;
+    using v8::Number;
+    using v8::Object;
+    using v8::Persistent;
+    using v8::String;
+    using v8::Value;
+
+    Persistent&lt;Function&gt; MyObject::constructor;
+
+    MyObject::MyObject(double value) : value_(value) {
+    }
+
+    MyObject::~MyObject() {
+    }
+
+    void MyObject::Init(Local&lt;Object&gt; exports) {
+    Isolate* isolate = exports-&gt;GetIsolate();
+
+    // Prepare constructor template
+    Local&lt;FunctionTemplate&gt; tpl = FunctionTemplate::New(isolate, New);
+    tpl-&gt;SetClassName(String::NewFromUtf8(isolate, &quot;MyObject&quot;));
+    tpl-&gt;InstanceTemplate()-&gt;SetInternalFieldCount(1);
+
+    // Prototype
+    NODE_SET_PROTOTYPE_METHOD(tpl, &quot;plusOne&quot;, PlusOne);
+
+    constructor.Reset(isolate, tpl-&gt;GetFunction());
+    exports-&gt;Set(String::NewFromUtf8(isolate, &quot;MyObject&quot;),
+    tpl-&gt;GetFunction());
+    }
+
+    void MyObject::New(const FunctionCallbackInfo&lt;Value&gt;&amp; args) {
+    Isolate* isolate = args.GetIsolate();
+
+    if (args.IsConstructCall()) {
+    // Invoked as constructor: `new MyObject(...)`
+    double value = args[0]-&gt;IsUndefined() ? 0 : args[0]-&gt;NumberValue();
+    MyObject* obj = new MyObject(value);
+    obj-&gt;Wrap(args.This());
+    args.GetReturnValue().Set(args.This());
+    } else {
+    // Invoked as plain function `MyObject(...)`, turn into construct call.
+    const int argc = 1;
+    Local&lt;Value&gt; argv[argc] = { args[0] };
+    Local&lt;Function&gt; cons = Local&lt;Function&gt;::New(isolate, constructor);
+    args.GetReturnValue().Set(cons-&gt;NewInstance(argc, argv));
+    }
+    }
+
+    void MyObject::PlusOne(const FunctionCallbackInfo&lt;Value&gt;&amp; args) {
+    Isolate* isolate = args.GetIsolate();
+
+    MyObject* obj = ObjectWrap::Unwrap&lt;MyObject&gt;(args.Holder());
+    obj-&gt;value_ += 1;
+
+    args.GetReturnValue().Set(Number::New(isolate, obj-&gt;value_));
+    }
+
+    }  // namespace demo</code></pre>
+            <p>测试：
+
+            </p>
+<pre><code>// test.js
+    var addon = require(&#39;./build/Release/addon&#39;);
+
+    var obj = new addon.MyObject(10);
+    console.log( obj.plusOne() ); // 11
+    console.log( obj.plusOne() ); // 12
+    console.log( obj.plusOne() ); // 13</code></pre>
+            <h3>Factory of wrapped objects(工厂包装对象)<span><a class="mark" href="#addons_factory_of_wrapped_objects" id="addons_factory_of_wrapped_objects">#</a></span></h3>
+            <p>
+                这是非常有用的，当你想创建原生的JavaScript对象时，
+                又不想明确的使用JavaScript的<code>new</code>操作符。
+
+            </p>
+<pre><code>var obj = addon.createObject();
+    // instead of:
+    // var obj = new addon.Object();</code></pre>
+            <p>
+                让我们注册在<code>addon.cc</code> 文件中注册<code>createObject</code>方法:
+
+            </p>
+<pre><code>// addon.cc
+    #include &lt;node.h&gt;
+    #include &quot;myobject.h&quot;
+
+    namespace demo {
+
+    using v8::FunctionCallbackInfo;
+    using v8::Isolate;
+    using v8::Local;
+    using v8::Object;
+    using v8::String;
+    using v8::Value;
+
+    void CreateObject(const FunctionCallbackInfo&lt;Value&gt;&amp; args) {
+    MyObject::NewInstance(args);
+    }
+
+    void InitAll(Local&lt;Object&gt; exports, Local&lt;Object&gt; module) {
+    MyObject::Init(exports-&gt;GetIsolate());
+
+    NODE_SET_METHOD(module, &quot;exports&quot;, CreateObject);
+    }
+
+    NODE_MODULE(addon, InitAll)
+
+    }  // namespace demo</code></pre>
+            <p>
+                在<code>myobject.h</code>文件中，我们现在介绍静态方法<code>NewInstance</code>，
+                它能够实例化对象（举个例子，它的工作就像是 在JavaScript中的<code>new</code> 操作符。）
+
+            </p>
+<pre><code>// myobject.h
+    #ifndef MYOBJECT_H
+    #define MYOBJECT_H
+
+    #include &lt;node.h&gt;
+    #include &lt;node_object_wrap.h&gt;
+
+    namespace demo {
+
+    class MyObject : public node::ObjectWrap {
+    public:
+    static void Init(v8::Isolate* isolate);
+    static void NewInstance(const v8::FunctionCallbackInfo&lt;v8::Value&gt;&amp; args);
+
+    private:
+    explicit MyObject(double value = 0);
+    ~MyObject();
+
+    static void New(const v8::FunctionCallbackInfo&lt;v8::Value&gt;&amp; args);
+    static void PlusOne(const v8::FunctionCallbackInfo&lt;v8::Value&gt;&amp; args);
+    static v8::Persistent&lt;v8::Function&gt; constructor;
+    double value_;
+    };
+
+    }  // namespace demo
+
+    #endif</code></pre>
+            <p>这里的处理方式和上面的 <code>myobject.cc</code>很像:
+
+            </p>
+<pre><code>// myobject.cc
+    #include &lt;node.h&gt;
+    #include &quot;myobject.h&quot;
+
+    namespace demo {
+
+    using v8::Function;
+    using v8::FunctionCallbackInfo;
+    using v8::FunctionTemplate;
+    using v8::Isolate;
+    using v8::Local;
+    using v8::Number;
+    using v8::Object;
+    using v8::Persistent;
+    using v8::String;
+    using v8::Value;
+
+    Persistent&lt;Function&gt; MyObject::constructor;
+
+    MyObject::MyObject(double value) : value_(value) {
+    }
+
+    MyObject::~MyObject() {
+    }
+
+    void MyObject::Init(Isolate* isolate) {
+    // Prepare constructor template
+    Local&lt;FunctionTemplate&gt; tpl = FunctionTemplate::New(isolate, New);
+    tpl-&gt;SetClassName(String::NewFromUtf8(isolate, &quot;MyObject&quot;));
+    tpl-&gt;InstanceTemplate()-&gt;SetInternalFieldCount(1);
+
+    // Prototype
+    NODE_SET_PROTOTYPE_METHOD(tpl, &quot;plusOne&quot;, PlusOne);
+
+    constructor.Reset(isolate, tpl-&gt;GetFunction());
+    }
+
+    void MyObject::New(const FunctionCallbackInfo&lt;Value&gt;&amp; args) {
+    Isolate* isolate = args.GetIsolate();
+
+    if (args.IsConstructCall()) {
+    // Invoked as constructor: `new MyObject(...)`
+    double value = args[0]-&gt;IsUndefined() ? 0 : args[0]-&gt;NumberValue();
+    MyObject* obj = new MyObject(value);
+    obj-&gt;Wrap(args.This());
+    args.GetReturnValue().Set(args.This());
+    } else {
+    // Invoked as plain function `MyObject(...)`, turn into construct call.
+    const int argc = 1;
+    Local&lt;Value&gt; argv[argc] = { args[0] };
+    Local&lt;Function&gt; cons = Local&lt;Function&gt;::New(isolate, constructor);
+    args.GetReturnValue().Set(cons-&gt;NewInstance(argc, argv));
+    }
+    }
+
+    void MyObject::NewInstance(const FunctionCallbackInfo&lt;Value&gt;&amp; args) {
+    Isolate* isolate = args.GetIsolate();
+
+    const unsigned argc = 1;
+    Local&lt;Value&gt; argv[argc] = { args[0] };
+    Local&lt;Function&gt; cons = Local&lt;Function&gt;::New(isolate, constructor);
+    Local&lt;Object&gt; instance = cons-&gt;NewInstance(argc, argv);
+
+    args.GetReturnValue().Set(instance);
+    }
+
+    void MyObject::PlusOne(const FunctionCallbackInfo&lt;Value&gt;&amp; args) {
+    Isolate* isolate = args.GetIsolate();
+
+    MyObject* obj = ObjectWrap::Unwrap&lt;MyObject&gt;(args.Holder());
+    obj-&gt;value_ += 1;
+
+    args.GetReturnValue().Set(Number::New(isolate, obj-&gt;value_));
+    }
+
+    }  // namespace demo</code></pre>
+            <p>测试：
+
+            </p>
+<pre><code>// test.js
+    var createObject = require(&#39;./build/Release/addon&#39;);
+
+    var obj = createObject(10);
+    console.log( obj.plusOne() ); // 11
+    console.log( obj.plusOne() ); // 12
+    console.log( obj.plusOne() ); // 13
+
+    var obj2 = createObject(20);
+    console.log( obj2.plusOne() ); // 21
+    console.log( obj2.plusOne() ); // 22
+    console.log( obj2.plusOne() ); // 23</code></pre>
+            <h3>Passing wrapped objects around(传递包装的对象)<span><a class="mark" href="#addons_passing_wrapped_objects_around" id="addons_passing_wrapped_objects_around">#</a></span></h3>
+            <p>
+                除了包装和返回c++对象以外，你可以传递他们并且通过Node的<code>node::ObjectWrap::Unwrap</code>帮助函数解包装他们。
+                在下面的<code>addon.cc</code> 文件中，我们介绍了一个函数<code>add()</code>，它能够获取2个<code>MyObject</code>对象。
+
+            </p>
+<pre><code>// addon.cc
+    #include &lt;node.h&gt;
+    #include &lt;node_object_wrap.h&gt;
+    #include &quot;myobject.h&quot;
+
+    namespace demo {
+
+    using v8::FunctionCallbackInfo;
+    using v8::Isolate;
+    using v8::Local;
+    using v8::Number;
+    using v8::Object;
+    using v8::String;
+    using v8::Value;
+
+    void CreateObject(const FunctionCallbackInfo&lt;Value&gt;&amp; args) {
+    MyObject::NewInstance(args);
+    }
+
+    void Add(const FunctionCallbackInfo&lt;Value&gt;&amp; args) {
+    Isolate* isolate = args.GetIsolate();
+
+    MyObject* obj1 = node::ObjectWrap::Unwrap&lt;MyObject&gt;(
+    args[0]-&gt;ToObject());
+    MyObject* obj2 = node::ObjectWrap::Unwrap&lt;MyObject&gt;(
+    args[1]-&gt;ToObject());
+
+    double sum = obj1-&gt;value() + obj2-&gt;value();
+    args.GetReturnValue().Set(Number::New(isolate, sum));
+    }
+
+    void InitAll(Local&lt;Object&gt; exports) {
+    MyObject::Init(exports-&gt;GetIsolate());
+
+    NODE_SET_METHOD(exports, &quot;createObject&quot;, CreateObject);
+    NODE_SET_METHOD(exports, &quot;add&quot;, Add);
+    }
+
+    NODE_MODULE(addon, InitAll)
+
+    }  // namespace demo</code></pre>
+            <p>为了使事情变得有趣，我们在 <code>myobject.h</code> 采用一个公共的方法，所以我们能够在unwrapping解包装对象之后使用私有成员的值。
+
+            </p>
+<pre><code>// myobject.h
+    #ifndef MYOBJECT_H
+    #define MYOBJECT_H
+
+    #include &lt;node.h&gt;
+    #include &lt;node_object_wrap.h&gt;
+
+    namespace demo {
+
+    class MyObject : public node::ObjectWrap {
+    public:
+    static void Init(v8::Isolate* isolate);
+    static void NewInstance(const v8::FunctionCallbackInfo&lt;v8::Value&gt;&amp; args);
+    inline double value() const { return value_; }
+
+    private:
+    explicit MyObject(double value = 0);
+    ~MyObject();
+
+    static void New(const v8::FunctionCallbackInfo&lt;v8::Value&gt;&amp; args);
+    static v8::Persistent&lt;v8::Function&gt; constructor;
+    double value_;
+    };
+
+    }  // namespace demo
+
+    #endif</code></pre>
+            <p><code>myobject.cc</code>文件的处理方式和前面类似:
+
+            </p>
+<pre><code>// myobject.cc
+    #include &lt;node.h&gt;
+    #include &quot;myobject.h&quot;
+
+    namespace demo {
+
+    using v8::Function;
+    using v8::FunctionCallbackInfo;
+    using v8::FunctionTemplate;
+    using v8::Isolate;
+    using v8::Local;
+    using v8::Object;
+    using v8::Persistent;
+    using v8::String;
+    using v8::Value;
+
+    Persistent&lt;Function&gt; MyObject::constructor;
+
+    MyObject::MyObject(double value) : value_(value) {
+    }
+
+    MyObject::~MyObject() {
+    }
+
+    void MyObject::Init(Isolate* isolate) {
+    // Prepare constructor template
+    Local&lt;FunctionTemplate&gt; tpl = FunctionTemplate::New(isolate, New);
+    tpl-&gt;SetClassName(String::NewFromUtf8(isolate, &quot;MyObject&quot;));
+    tpl-&gt;InstanceTemplate()-&gt;SetInternalFieldCount(1);
+
+    constructor.Reset(isolate, tpl-&gt;GetFunction());
+    }
+
+    void MyObject::New(const FunctionCallbackInfo&lt;Value&gt;&amp; args) {
+    Isolate* isolate = args.GetIsolate();
+
+    if (args.IsConstructCall()) {
+    // Invoked as constructor: `new MyObject(...)`
+    double value = args[0]-&gt;IsUndefined() ? 0 : args[0]-&gt;NumberValue();
+    MyObject* obj = new MyObject(value);
+    obj-&gt;Wrap(args.This());
+    args.GetReturnValue().Set(args.This());
+    } else {
+    // Invoked as plain function `MyObject(...)`, turn into construct call.
+    const int argc = 1;
+    Local&lt;Value&gt; argv[argc] = { args[0] };
+    Local&lt;Function&gt; cons = Local&lt;Function&gt;::New(isolate, constructor);
+    args.GetReturnValue().Set(cons-&gt;NewInstance(argc, argv));
+    }
+    }
+
+    void MyObject::NewInstance(const FunctionCallbackInfo&lt;Value&gt;&amp; args) {
+    Isolate* isolate = args.GetIsolate();
+
+    const unsigned argc = 1;
+    Local&lt;Value&gt; argv[argc] = { args[0] };
+    Local&lt;Function&gt; cons = Local&lt;Function&gt;::New(isolate, constructor);
+    Local&lt;Object&gt; instance = cons-&gt;NewInstance(argc, argv);
+
+    args.GetReturnValue().Set(instance);
+    }
+
+    }  // namespace demo</code></pre>
+            <p>测试：
+
+            </p>
+<pre><code>// test.js
+    var addon = require(&#39;./build/Release/addon&#39;);
+
+    var obj1 = addon.createObject(10);
+    var obj2 = addon.createObject(20);
+    var result = addon.add(obj1, obj2);
+
+    console.log(result); // 30</code></pre>
+            <h3>AtExit hooks(AtExit钩子)<span><a class="mark" href="#addons_atexit_hooks" id="addons_atexit_hooks">#</a></span></h3>
+            <h4>void AtExit(callback, args)<span><a class="mark" href="#addons_void_atexit_callback_args" id="addons_void_atexit_callback_args">#</a></span></h4>
+            <ul>
+                <li><code>callback</code>: <code>void (*)(void*)</code> -一个指向函数的指针，在退出时执行。</li>
+                <li><code>args</code>: <code>void*</code> - 在退出指针传递给回调函数。</li>
+            </ul>
+            <p>
+                注册退出钩子在事件循环结束之后，在VM被终止之前。
+            </p>
+            <p>
+                回调函数按照先出后进法执行。AtExit需要两个参数：
+                一个指向回调函数的指针，在退出时执行，和传递给回调函数的一个指向无类型的上下文数据的指针
+            </p>
+            <p>
+                下面的<code>addon.cc</code>文件实现了AtExit:
+            </p>
+<pre><code>// addon.cc
+    #undef NDEBUG
+    #include &lt;assert.h&gt;
+    #include &lt;stdlib.h&gt;
+    #include &lt;node.h&gt;
+
+    namespace demo {
+
+    using node::AtExit;
+    using v8::HandleScope;
+    using v8::Isolate;
+    using v8::Local;
+    using v8::Object;
+
+    static char cookie[] = &quot;yum yum&quot;;
+    static int at_exit_cb1_called = 0;
+    static int at_exit_cb2_called = 0;
+
+    static void at_exit_cb1(void* arg) {
+    Isolate* isolate = static_cast&lt;Isolate*&gt;(arg);
+    HandleScope scope(isolate);
+    Local&lt;Object&gt; obj = Object::New(isolate);
+    assert(!obj.IsEmpty()); // assert VM is still alive
+    assert(obj-&gt;IsObject());
+    at_exit_cb1_called++;
+    }
+
+    static void at_exit_cb2(void* arg) {
+    assert(arg == static_cast&lt;void*&gt;(cookie));
+    at_exit_cb2_called++;
+    }
+
+    static void sanity_check(void*) {
+    assert(at_exit_cb1_called == 1);
+    assert(at_exit_cb2_called == 2);
+    }
+
+    void init(Local&lt;Object&gt; exports) {
+    AtExit(sanity_check);
+    AtExit(at_exit_cb2, cookie);
+    AtExit(at_exit_cb2, cookie);
+    AtExit(at_exit_cb1, exports-&gt;GetIsolate());
+    }
+
+    NODE_MODULE(addon, init);
+
+    }  // namespace demo</code></pre>
+            <p>
+                在js中执行，通过：
+            </p>
+<pre><code>// test.js
+    var addon = require(&#39;./build/Release/addon&#39;);</code></pre>
+
+        </div>
+    </div>
+</div>
+<div id="footer">
+</div>
+
+<script src="assets/sh_main.js"></script>
+<script src="assets/sh_javascript.min.js"></script>
+<script>highlight(undefined, undefined, 'pre');</script>
+</body>
+</html>
+
